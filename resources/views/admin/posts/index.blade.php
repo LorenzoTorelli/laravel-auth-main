@@ -9,6 +9,7 @@
             <th scope="col">#</th>
             <th scope="col">Title</th>
             <th scope="col">Slug</th>
+            <th scope="col">Categories</th>
             <th scope="col">Commands</th>
           </tr>
         </thead>
@@ -18,6 +19,14 @@
                     <th>{{$item->id}}</th>
                     <td>{{$item->title}}</td>
                     <td>{{$item->slug}}</td>
+                    <td>
+                        @if ($item->category) 
+                            {{$item->category->title}}
+                        @else 
+                            Nessuna Categoria
+                        @endif
+                    </td>
+
                     <td>
                         <div class="d-flex">
                             <a href="{{route("posts.show", $item->id)}}"><button type="button" class="btn btn-primary">View</button></a>

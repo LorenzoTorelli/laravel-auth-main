@@ -6,10 +6,18 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
+use App\Category;
 use App\Post;
 
 class PostController extends Controller
 {
+    
+    protected $validationRule = [
+        "title" => "required|string|max:100",
+        "content" => "required",
+        "published" => "sometimes|accepted",
+        "category_id" => "nullable|exists:categories,id"
+    ];
     /**
      * Display a listing of the resource.
      *
@@ -30,7 +38,8 @@ class PostController extends Controller
      */
     public function create()
     {
-        return view("admin.posts.create");
+        $categories = Category::all();
+        return view("admin.posts.create",compact("categories") );
 
     }
 
@@ -42,16 +51,13 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            "title" => "required|string|max:100",
-            "content" => "required",
-            "published" => "sometimes|accepted",
-        ]);
+        $request->validate($this->validationRule);
 
         $data = $request->all();
         $newPost = new Post();
         $newPost->title = $data['title']; 
         $newPost->content = $data["content"];
+        $newPost->category_id = $data["category_id"];
 
         if (isset($data["published"])) {
             $newPost->published = true;
@@ -91,7 +97,8 @@ class PostController extends Controller
      */
     public function edit(Post $post)
     {
-        return view("admin.posts.edit", compact('post'));
+        $categories = Category::all();
+        return view("admin.posts.edit", compact('post', 'categories'));
     }
 
     /**
@@ -103,11 +110,7 @@ class PostController extends Controller
      */
     public function update(Request $request, Post $post)
     {
-        $request->validate([
-            "title" => "required|string|max:100",
-            "content" => "required",
-            "published" => "sometimes|accepted",
-        ]);
+        $request->validate($this->validationRule);
 
         $data = $request->all();
 
@@ -128,6 +131,7 @@ class PostController extends Controller
         }
 
         $post->content = $data["content"];
+        $post->category_id = $data["category_id"];
         
         $post->published = isset($data["published"]);
 
